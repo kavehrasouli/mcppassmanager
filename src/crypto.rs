@@ -34,7 +34,8 @@ pub fn decrypt(data: &[u8], key: &[u8; 32]) -> Result<String, Box<dyn std::error
     let nonce = Nonce::from_slice(nonce_bytes);
 
     let cipher = ChaCha20Poly1305::new(key.into());
-    let plaintext = cipher.decrypt(nonce, ciphertext)?;
+    let plaintext = cipher.decrypt(nonce, ciphertext)
+        .map_err(|e| format!("decryption failed: {e}"))?;
 
     Ok(String::from_utf8(plaintext)?)
 }
