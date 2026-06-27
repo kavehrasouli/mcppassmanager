@@ -1,7 +1,7 @@
 use rusqlite::{Connection, Result};
 
-pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error>
-{
+pub fn init_db(conn: &Connection
+) -> Result<(), rusqlite::Error> {
     conn.execute(
         "CREATE TABLE IF NOT EXISTS salt (
             id      INTEGER PRIMARY KEY,
@@ -13,7 +13,7 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error>
     conn.execute(
         "CREATE TABLE IF NOT EXISTS credentials (
             site        TEXT PRIMARY KEY,
-            username    TEXT NOT NULL,
+            username    BLOB NOT NULL,
             password    BLOB NOT NULL
         )",
         [],
@@ -23,8 +23,7 @@ pub fn init_db(conn: &Connection) -> Result<(), rusqlite::Error>
 }
 
 pub fn store_salt(conn: &Connection, 
-    salt: &[u8; 16]) -> Result<(), rusqlite::Error>
-{
+    salt: &[u8; 16]) -> Result<(), rusqlite::Error> {
     conn.execute(
         "INSERT INTO salt (id, value) VALUES (1, ?1)",
         [salt.as_slice()],
@@ -32,8 +31,7 @@ pub fn store_salt(conn: &Connection,
     Ok(())
 }
 
-pub fn load_salt(conn: &Connection) -> Option<[u8; 16]>
-{
+pub fn load_salt(conn: &Connection) -> Option<[u8; 16]> {
     let result = Result<Vec<u8>, _> = conn.query_row(
         "SELECT value FROM salt WHERE id = 1",
         [],
@@ -47,8 +45,7 @@ pub fn load_salt(conn: &Connection) -> Option<[u8; 16]>
 }
 
 pub fn store_credential(conn: &Connection, site: &str, 
-    username: &str, ciphertext: &[u8]) -> Result<(), rusqlite::Error>
-{
+    username: &[u8], ciphertext: &[u8]) -> Result<(), rusqlite::Error> {
     conn.execute(
         "INSERT INTO credentials (site, username, password) VALUES (?1, ?2, ?3)",
         rusqlite::params![site, username, ciphertext],
@@ -56,8 +53,7 @@ pub fn store_credential(conn: &Connection, site: &str,
     Ok(())
 }
 
-pub fn get_credential(conn: &Connection, site: &str) -> Option<(String, Vec<u8>)>
-{
+pub fn get_credential(conn: &Connection, site: &str) -> Option<(String, Vec<u8>)> {
     conn.query_row(
         "SELECT username, password FROM credentials WHERE site = ?1",
         rusqlite::params![site],
@@ -65,8 +61,7 @@ pub fn get_credential(conn: &Connection, site: &str) -> Option<(String, Vec<u8>)
     ).ok()
 }
 
-pub fn list_sites(conn: &Connection) -> Vec<String>
-{
+pub fn list_sites(conn: &Connection) -> Vec<String> {
     let mut stmt = conn.prepare("SELECT site FROM credentials").unwrap();
     stmt.query_map([], |row| row.get(0))
         .unwrap()
@@ -75,8 +70,7 @@ pub fn list_sites(conn: &Connection) -> Vec<String>
 }
 
 pub fn delete_credential(conn: &Connection, 
-    site: &str) -> Result<(), rusqlite::Error>
-{
+    site: &str) -> Result<(), rusqlite::Error> {
     conn.execute(
         "DELETE FROM credentials WHERE site = ?1",
         rusqlite::params![site],
