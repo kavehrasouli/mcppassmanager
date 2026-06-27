@@ -32,7 +32,7 @@ pub fn store_salt(conn: &Connection,
 }
 
 pub fn load_salt(conn: &Connection) -> Option<[u8; 16]> {
-    let result = Result<Vec<u8>, _> = conn.query_row(
+    let result: Result<Vec<u8>, _> = conn.query_row(
         "SELECT value FROM salt WHERE id = 1",
         [],
         |row| row.get(0)
@@ -53,7 +53,7 @@ pub fn store_credential(conn: &Connection, site: &str,
     Ok(())
 }
 
-pub fn get_credential(conn: &Connection, site: &str) -> Option<(String, Vec<u8>)> {
+pub fn get_credential(conn: &Connection, site: &str) -> Option<(Vec<u8>, Vec<u8>)> {
     conn.query_row(
         "SELECT username, password FROM credentials WHERE site = ?1",
         rusqlite::params![site],
