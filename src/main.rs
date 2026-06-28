@@ -9,7 +9,12 @@ use tokio::io::{stdin, stdout};
 
 #[tokio::main]
 async fn main() {
-    let conn = Connection::open("passwords.db").unwrap();
+    let db_path = dirs::data_dir()
+        .expect("could not find data directory")
+        .join("passmanager")
+        .join("passwords.db");
+    std::fs::create_dir_all(db_path.parent().unwrap()).unwrap();
+    let conn = Connection::open(&db_path).unwrap();
     let service = PassManager::new(conn);
     let transport = (stdin(), stdout());
     service.serve(transport).await.unwrap();
