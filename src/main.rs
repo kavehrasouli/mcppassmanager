@@ -17,5 +17,5 @@ async fn main() {
     let conn = Connection::open(&db_path).unwrap();
     let service = PassManager::new(conn);
     let transport = (stdin(), stdout());
-    service.serve(transport).await.unwrap();
+    service.serve(transport).await.unwrap().waiting().await.unwrap();
 }

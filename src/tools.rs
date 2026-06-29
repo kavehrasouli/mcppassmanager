@@ -1,4 +1,4 @@
-use rmcp::{ServerHandler, model::ServerInfo, schemars, tool};
+use rmcp::{ServerHandler, model::{ServerCapabilities, ServerInfo}, schemars, tool};
 use serde::Deserialize;
 use rusqlite::Connection;
 use std::sync::{Arc, Mutex};
@@ -93,6 +93,7 @@ impl ServerHandler for PassManager {
     fn get_info(&self) -> ServerInfo {
         ServerInfo {
             instructions: Some("A secure pass manager".into()),
+            capabilities: ServerCapabilities::builder().enable_tools().build(),
             ..Default::default()
         }
     }
